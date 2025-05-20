@@ -50,6 +50,7 @@ export default function AddEditTaskScreen() {
 
     navigation.setOptions({
       title: isEdit ? "Edit Task" : "Add Task",
+        headerBackTitleVisible: false, 
     });
 
     

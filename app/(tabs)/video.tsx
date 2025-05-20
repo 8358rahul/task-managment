@@ -1,5 +1,6 @@
 import NoDataFound from "@/components/NoDataFound";
 import RenderVideoItem from "@/components/RenderVideoItem";
+import AndPoints from "@/constants/AndPoints";
 import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/hooks/useTheme";
 import { useVideoStore } from "@/store/videoStore";
@@ -23,7 +24,7 @@ export default function OfflineVideoScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
-  const { theme, setTheme,resolvedTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const navigation = useNavigation();
 
   const onViewRef = useRef(
@@ -38,7 +39,6 @@ export default function OfflineVideoScreen() {
   const viewConfigRef = useRef({
     itemVisiblePercentThreshold: 60,
   });
- 
 
   // Fetch video list JSON
   useEffect(() => {
@@ -47,9 +47,13 @@ export default function OfflineVideoScreen() {
       headerRight: () => (
         <TouchableOpacity
           onPress={() => {
-             const nextTheme =
-    theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
-  setTheme(nextTheme);
+            const nextTheme =
+              theme === "light"
+                ? "dark"
+                : theme === "dark"
+                ? "system"
+                : "light";
+            setTheme(nextTheme);
           }}
           style={{ right: ms(10) }}
         >
@@ -65,9 +69,7 @@ export default function OfflineVideoScreen() {
 
   async function fetchVideos() {
     try {
-      const data = await fetcher(
-        "https://gist.githubusercontent.com/poudyalanil/ca84582cbeb4fc123a13290a586da925/raw/14a27bd0bcd0cd323b35ad79cf3b493dddf6216b/videos.json"
-      );
+      const data = await fetcher(AndPoints.VIDEOURL);
       setVideoList(data);
     } catch (e) {
       Alert.alert("Error", "Unable to load video list.");

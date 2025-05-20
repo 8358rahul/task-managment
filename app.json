@@ -8,6 +8,8 @@
     "scheme": "taskmanagment",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "jsEngine": "hermes",
+
     "ios": {
       "supportsTablet": true
     },
@@ -39,6 +41,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a9d5d308-ae54-4915-abaf-22b2746a6f56"
+      }
+    },
+    "owner": "rahulshanisare"
   }
 }

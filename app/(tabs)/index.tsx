@@ -3,6 +3,7 @@ import FloatingAddButton from "@/components/FloatingAddButton";
 import NoDataFound from "@/components/NoDataFound";
 import TaskCard from "@/components/TaskItem";
 import { ThemedView } from "@/components/ThemedView";
+import AndPoints from "@/constants/AndPoints";
 import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/hooks/useTheme";
 import { useTaskStore } from "@/store/taskStore";
@@ -58,9 +59,7 @@ export default function TaskScreen() {
 
   async function fetchTasks() {
     try {
-      const data = await fetcher(
-        "https://jsonplaceholder.typicode.com/todos?_limit=20"
-      );
+      const data = await fetcher(AndPoints.TASKURL);
       const initialTasks = data?.map((t: any) => ({
         id: t?.id,
         title: t?.title,

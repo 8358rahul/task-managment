@@ -1,3 +1,5 @@
+import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/hooks/useTheme";
 import { useVideoStore } from "@/store/videoStore";
 import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
@@ -31,7 +33,7 @@ export default function RenderVideoItem({
   const [progressMap, setProgressMap] = useState<Record<string, number>>({});
   const [isDownloading, setIsDownloading] = useState(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
-
+  const {resolvedTheme} = useTheme()
   const isDownloaded = !!downloaded[item.id];
   const progress = progressMap[item.id] || 0;
   const sourceUri = isDownloaded
@@ -126,13 +128,13 @@ export default function RenderVideoItem({
         {/* Download Button */}
         {!isDownloaded && !isDownloading && (
           <TouchableOpacity style={styles.downloadIcon} onPress={downloadVideo}>
-            <Ionicons name="download" size={22} color="#fff" />
+            <Ionicons name="download" size={22} color={Colors.white} />
           </TouchableOpacity>
         )}
 
         {isDownloading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={Colors.primary} />
             <Text style={styles.progressText}>
               {(progress * 100).toFixed(0)}%
             </Text>
