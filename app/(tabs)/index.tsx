@@ -1,75 +1,145 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import FilterView from "@/components/FilterView";
+import FloatingAddButton from "@/components/FloatingAddButton";
+import NoDataFound from "@/components/NoDataFound";
+import TaskCard from "@/components/TaskItem";
+import { ThemedView } from "@/components/ThemedView";
+import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/hooks/useTheme";
+import { useTaskStore } from "@/store/taskStore";
+import { fetcher } from "@/utils/fetcher";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { router, useNavigation } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { ms, vs } from "react-native-size-matters";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function TaskScreen() {
+  const { theme, setTheme,resolvedTheme } = useTheme();
+  const { tasks, addTask, toggleTask } = useTaskStore();
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"all" | "completed" | "incomplete">(
+    "all"
+  );
+  const [sortBy, setSortBy] = useState<"dueDate" | "priority">("dueDate");
 
-export default function HomeScreen() {
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    if (tasks.length === 0) {
+      fetchTasks();
+    } else {
+      setLoading(false);
+    }
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => {
+            const nextTheme =
+    theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
+  setTheme(nextTheme);
+          }}
+          style={{ right: ms(10) }}
+        >
+          <MaterialCommunityIcons
+            name="theme-light-dark"
+            size={ms(24)}
+            color={Colors[resolvedTheme].icon}
+          />
+        </TouchableOpacity>
+      ),
+    });
+  }, []);
+
+  async function fetchTasks() {
+    try {
+      const data = await fetcher(
+        "https://jsonplaceholder.typicode.com/todos?_limit=20"
+      );
+      const initialTasks = data?.map((t: any) => ({
+        id: t?.id,
+        title: t?.title,
+        description: "",
+        dueDate: new Date().toISOString(),
+        priority: 2,
+        completed: t?.completed,
+      }));
+      initialTasks.forEach((task: any) => addTask(task));
+    } catch (e) {
+      console.log(e);
+      Alert.alert("Error", "Failed to fetch tasks.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Filtering
+  const filtered = tasks?.filter((task: any) =>
+    filter === "all"
+      ? true
+      : filter === "completed"
+      ? task.completed
+      : !task.completed
+  );
+
+  // Sorting
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === "dueDate") {
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    } else {
+      return a.priority - b.priority;
+    }
+  });
+
+  if (loading)
+    return (
+      <ActivityIndicator
+        size={"large"}
+        color={Colors.primary}
+        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      />
+    );
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <ThemedView style={{ flex: 1, padding: ms(12) }}>
+      {/* Filter Buttons */}
+
+      <FilterView
+        setFilter={setFilter}
+        setSortBy={setSortBy}
+        filter={filter}
+        sortBy={sortBy}
+      />
+
+      <View style={{ height: vs(18) }} />
+
+      <FlatList
+        data={sorted}
+        keyExtractor={(item, index) => index?.toString()}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={<NoDataFound onPress={() => fetchTasks()} />}
+        contentContainerStyle={{ paddingBottom: vs(80) }}
+        renderItem={({ item }) => {
+          return (
+            <TaskCard
+              task={item}
+              onToggle={() => toggleTask(item.id)}
+              onPress={() =>
+                router.push({
+                  pathname: "/task-details",
+                  params: { taskId: item.id },
+                })
+              }
+            />
+          );
+        }}
+      />
+      <FloatingAddButton onPress={() => router.push("/add-edit-task")} />
+    </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
