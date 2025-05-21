@@ -1,9 +1,10 @@
 import { Colors } from "@/constants/Colors";
 import { useVideoStore } from "@/store/videoStore";
 import { Ionicons } from "@expo/vector-icons";
+import { useEvent } from "expo";
 import * as FileSystem from "expo-file-system";
-import { useFocusEffect } from "expo-router";
-import React, { useCallback, useRef, useState } from "react";
+import { useVideoPlayer, VideoView } from "expo-video";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,7 +15,6 @@ import {
   View,
 } from "react-native";
 import { ms, ScaledSheet } from "react-native-size-matters";
-import Video, { VideoRef } from "react-native-video";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
 
@@ -28,10 +28,6 @@ export default function RenderVideoItem({
   const { downloaded, setDownloadedUri } = useVideoStore();
   const [progressMap, setProgressMap] = useState<Record<string, number>>({});
   const [isDownloading, setIsDownloading] = useState(false);
-  const playerRef = useRef<VideoRef>(null);
-  const [paused, setPaused] = React.useState(true);
-const [currentTime, setCurrentTime] = useState(0);
-const [showThumbnail, setShowThumbnail] = useState(true);
 
   const isDownloaded = !!downloaded[item.id];
   const progress = progressMap[item.id] || 0;
@@ -42,14 +38,24 @@ const [showThumbnail, setShowThumbnail] = useState(true);
     ? item.videoUrl
     : null;
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        // Pause video on screen unfocus
-        setPaused(true);
+  const player = useVideoPlayer({ uri: sourceUri }, (player) => {
+    player.loop = true;
+    // player.play();
+  });
+
+  const { isPlaying } = useEvent(player, "playingChange", {
+    isPlaying: player.playing,
+  });
+
+  useEffect(()=>{
+ return () => {
+        player.pause();
       };
-    }, [])
-  );
+  },[])
+
+ 
+
+  
   const downloadVideo = async () => {
     if (!isConnected) {
       Alert.alert("Offline", "Cannot download while offline.");
@@ -104,57 +110,20 @@ const [showThumbnail, setShowThumbnail] = useState(true);
   return (
     <ThemedView style={styles.card}>
       <View style={styles.thumbnailWrapper}>
-        <View style={styles.controlButtons}>
-  <TouchableOpacity
-    onPress={() => {
-      if (playerRef.current) {
-        playerRef.current.seek(Math.max(currentTime - 10, 0));
-      }
-    }}
-    style={styles.skipButton}
-  >
-    <Ionicons name="play-back" size={24} color={Colors.white} />
-  </TouchableOpacity>
+        {!isPlaying && (
+          <Image
+            source={{ uri: item.thumbnailUrl }}
+            style={styles.video}
+            resizeMode="cover"
+          />
+        )}
 
-  <TouchableOpacity
-    onPress={() => {
-      if (playerRef.current) {
-        playerRef.current.seek(currentTime + 10);
-      }
-    }}
-    style={styles.skipButton}
-  >
-    <Ionicons name="play-forward" size={24} color={Colors.white} />
-  </TouchableOpacity>
-</View>
-
-        <Video
-          ref={playerRef}
-          source={{ uri: sourceUri }}
+        <VideoView
           style={styles.video}
-          paused={paused}
-          resizeMode="cover"
-          onBuffer={({ isBuffering }) => console.log("Buffering:", isBuffering)}
-          onError={(e) => console.log("Video error:", e)}
-          onLoad={() => console.log("Video loaded")} 
-          onProgress={({ currentTime }) => {
-      setCurrentTime(currentTime);
-      if (currentTime > 0) setShowThumbnail(false); // Hide thumbnail on play
-    }}
-    onEnd={() => {
-      setPaused(true);
-      setShowThumbnail(true); // Show thumbnail again on replay
-    }}
-    
-
+          player={player}
+          allowsFullscreen
+          allowsPictureInPicture
         />
-        {showThumbnail && (
-    <Image
-      source={{ uri: item.thumbnailUrl }}
-      style={styles.video}
-      resizeMode="cover"
-    />
-  )}
 
         <View style={styles.durationBadge}>
           <Text style={styles.durationText}>{item?.duration}</Text>
@@ -162,28 +131,16 @@ const [showThumbnail, setShowThumbnail] = useState(true);
 
         {!isDownloaded && !isDownloading && (
           <TouchableOpacity style={styles.downloadIcon} onPress={downloadVideo}>
-            <Ionicons name="download" size={22} color={Colors.white} />
+            <Ionicons name="download" size={ms(25)} color={Colors.white} />
           </TouchableOpacity>
         )}
-        <TouchableOpacity
-          style={styles.playButton}
-          onPress={() => {
-            setPaused(!paused);
-          }}
-        >
-          <Ionicons
-            name={paused ? "play" : "pause"}
-            size={ms(30)}
-            color={Colors.white}
-          />
-        </TouchableOpacity>
 
         {isDownloading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator color={Colors.primary} />
-            <Text style={styles.progressText}>
+            <ActivityIndicator color={Colors.primary} size={'large'}/>
+            <ThemedText type="defaultSemiBold" style={styles.progressText}>
               {(progress * 100).toFixed(0)}%
-            </Text>
+            </ThemedText>
           </View>
         )}
       </View>
@@ -215,14 +172,14 @@ const styles = ScaledSheet.create({
     overflow: "hidden",
   },
   thumbnailWrapper: {
-   width: "100%",
-  aspectRatio: 16 / 9,
-  borderTopLeftRadius: 12,
-  borderTopRightRadius: 12,
-  overflow: "hidden",
-  backgroundColor: "#000",
-  position: "relative",
-  },  
+    width: "100%",
+    aspectRatio: 16 / 9,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#000",
+    position: "relative",
+  },
   durationBadge: {
     position: "absolute",
     bottom: 8,
@@ -262,9 +219,9 @@ const styles = ScaledSheet.create({
     paddingHorizontal: "8@ms",
   },
   video: {
-  ...StyleSheet.absoluteFillObject,
-  borderRadius: 12,
-},
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 12,
+  },
   textContainer: {
     flex: 1,
     marginLeft: 10,
@@ -299,30 +256,18 @@ const styles = ScaledSheet.create({
     color: Colors.white,
     marginLeft: 6,
   },
-  playButton: {
-    position: "absolute",
-    backgroundColor: "#00000070",
-    padding: 6,
-    borderRadius: 20,
-    zIndex: 100,
-
-    top: 10,
-    left: 10,
- 
-  },
   controlButtons: {
-  position: "absolute",
-  bottom: 12,
-  left: 12,
-  flexDirection: "row",
-  gap: 16,
-  zIndex: 50,
-},
+    position: "absolute",
+    bottom: 12,
+    left: 12,
+    flexDirection: "row",
+    gap: 16,
+    zIndex: 50,
+  },
 
-skipButton: {
-  backgroundColor: "#00000088",
-  padding: 10,
-  borderRadius: 20,
-},
-
+  skipButton: {
+    backgroundColor: "#00000088",
+    padding: 10,
+    borderRadius: 20,
+  },
 });

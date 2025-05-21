@@ -40,18 +40,13 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ],  
+      ],
       "expo-localization",
-      [
-        "react-native-video",
+       [
+        "expo-video",
         {
-          "enableNotificationControls": true,
-          "androidExtensions": {
-            "useExoplayerRtsp": false,
-            "useExoplayerSmoothStreaming": false,
-            "useExoplayerHls": false,
-            "useExoplayerDash": false
-          }
+          "supportsBackgroundPlayback": true,
+          "supportsPictureInPicture": true
         }
       ]
     ],

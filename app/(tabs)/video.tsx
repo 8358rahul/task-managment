@@ -1,57 +1,32 @@
 import NoDataFound from "@/components/NoDataFound";
 import RenderVideoItem from "@/components/RenderVideoItem";
 import AndPoints from "@/constants/AndPoints";
-import { Colors } from "@/constants/Colors";
-import { useTheme } from "@/hooks/useTheme";
 import { useVideoStore } from "@/store/videoStore";
 import { fetcher } from "@/utils/fetcher";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import NetInfo from "@react-native-community/netinfo";
-import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   FlatList,
   Text,
-  TouchableOpacity,
-  View,
+  View
 } from "react-native";
-import { ms, vs } from "react-native-size-matters";
+import { vs } from "react-native-size-matters";
 
 export default function OfflineVideoScreen() {
   const { videoList, setVideoList } = useVideoStore();
   const [isLoading, setIsLoading] = useState(true);
-  const [isConnected, setIsConnected] = useState(true); 
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  const navigation = useNavigation();
+  const [isConnected, setIsConnected] = useState(true);  
 
  
   // Fetch video list JSON
-  useEffect(() => {
-    fetchVideos();
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={() => {
-            const nextTheme =
-              theme === "light"
-                ? "dark"
-                : theme === "dark"
-                ? "system"
-                : "light";
-            setTheme(nextTheme);
-          }}
-          style={{ right: ms(10) }}
-        >
-          <MaterialCommunityIcons
-            name="theme-light-dark"
-            size={ms(24)}
-            color={Colors[resolvedTheme].icon}
-          />
-        </TouchableOpacity>
-      ),
-    });
+  useEffect(() => { 
+    if(videoList.length===0){
+      fetchVideos();
+    }else{
+      setIsLoading(false);
+    }
   }, []);
 
   async function fetchVideos() {
