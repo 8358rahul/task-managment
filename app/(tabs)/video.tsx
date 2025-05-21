@@ -6,37 +6,32 @@ import { useNetInfo } from "@/store/netInfo";
 import { useVideoStore } from "@/store/videoStore";
 import { fetcher } from "@/utils/fetcher";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Text } from "react-native";
 import { vs } from "react-native-size-matters";
-import { VideoPlayerRef } from "react-native-video-player";
 
 export default function OfflineVideoScreen() {
   const { videoList, setVideoList } = useVideoStore();
-  const [isLoading, setIsLoading] = useState(true);
-  const playerRef = useRef<VideoPlayerRef>(null);
+  const [isLoading, setIsLoading] = useState(true); 
   const { isConnected } = useNetInfo();
 
- 
-  useEffect(()=>{ 
-    if(videoList?.length>0) {
-      setIsLoading(false)
+  useEffect(() => {
+    if (videoList?.length > 0) {
+      setIsLoading(false);
       return;
-    };
+    }
     fetchVideos();
-   
-  },[])
-const [screenFocused, setScreenFocused] = useState(true);
+  }, []);
+  const [screenFocused, setScreenFocused] = useState(true);
 
-
-useFocusEffect(
-  useCallback(() => {
-    setScreenFocused(true);
-    return () => {
-      setScreenFocused(false);
-    };
-  }, [])
-);
+  useFocusEffect(
+    useCallback(() => {
+      setScreenFocused(true);
+      return () => {
+        setScreenFocused(false);
+      };
+    }, [])
+  );
 
   async function fetchVideos() {
     console.log("fetching videos");
@@ -70,9 +65,8 @@ useFocusEffect(
         renderItem={({ item }) => (
           <RenderVideoItem
             item={item}
-            isConnected={isConnected}
-            playerRef={playerRef}
-      paused={!screenFocused}
+            isConnected={isConnected} 
+            paused={!screenFocused}
           />
         )}
         contentContainerStyle={{ paddingBottom: vs(80) }}

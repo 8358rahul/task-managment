@@ -19,82 +19,92 @@ import VideoPlayer from "react-native-video-player";
 
 export default function RenderVideoItem({
   item,
-  isConnected,
-  playerRef,
-  paused
+  isConnected, 
+  paused,
 }: {
   item: any;
-  isConnected: boolean;
-  playerRef:any
-  paused:boolean
+  isConnected: boolean; 
+  paused: boolean;
 }) {
   const { downloaded, setDownloadedUri } = useVideoStore();
   const [progressMap, setProgressMap] = useState<Record<string, number>>({});
-  const [isDownloading, setIsDownloading] = useState(false); 
-
- 
-
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const isDownloaded = !!downloaded[item.id];
-  const progress = progressMap[item.id] || 0;
-
+  const progress = progressMap[item.id] || 0; 
   const sourceUri = isDownloaded
     ? downloaded[item.id]
     : isConnected
     ? item.videoUrl
-    : null;  
- 
+    : null;
 
- const downloadVideo = async () => {
-  if (!isConnected) {
-    Alert.alert("Offline", "Cannot download while offline.");
-    return;
-  }
+  const downloadVideo = async () => {
+    if (!isConnected) {
+      Alert.alert("Offline", "Cannot download while offline.");
+      return;
+    }
 
-  // Add null check for documentDirectory
-  const documentDir = FileSystem.documentDirectory;
-  if (!documentDir) {
-    Alert.alert("Error", "Cannot access storage directory");
-    return;
-  }
+    // Add null check for documentDirectory
+    const documentDir = FileSystem.documentDirectory;
+    if (!documentDir) {
+      Alert.alert("Error", "Cannot access storage directory");
+      return;
+    }
 
-  const uri = documentDir + `video_${item.id}.mp4`; // Now safe to use
+    const uri = documentDir + `video_${item.id}.mp4`; // Now safe to use
 
-  const callback = (dl: FileSystem.DownloadProgressData) => {
-    const prog = dl.totalBytesExpectedToWrite
-      ? dl.totalBytesWritten / dl.totalBytesExpectedToWrite
-      : 0;
-    setProgressMap((prev) => ({ ...prev, [item.id]: prog }));
+    const callback = (dl: FileSystem.DownloadProgressData) => {
+      const prog = dl.totalBytesExpectedToWrite
+        ? dl.totalBytesWritten / dl.totalBytesExpectedToWrite
+        : 0;
+      setProgressMap((prev) => ({ ...prev, [item.id]: prog }));
+    };
+
+    const downloadResumable = FileSystem.createDownloadResumable(
+      item.videoUrl,
+      uri,
+      {},
+      callback
+    );
+
+    try {
+      setIsDownloading(true);
+      const result = await downloadResumable.downloadAsync();
+
+      if (!result) throw new Error("Download failed: no result");
+      setDownloadedUri(item.id, result.uri);
+    } catch (e) {
+      console.error("Download error:", e);
+      Alert.alert(
+        "Download Error",
+        e instanceof Error ? e.message : "Unknown error"
+      );
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
-  const downloadResumable = FileSystem.createDownloadResumable(
-    item.videoUrl,
-    uri,
-    {},
-    callback
-  );
-
-  try {
-    setIsDownloading(true);
-    const result = await downloadResumable.downloadAsync();
-    
-    if (!result) throw new Error('Download failed: no result');
-    setDownloadedUri(item.id, result.uri);
-  } catch (e) {
-    console.error("Download error:", e);
-    Alert.alert("Download Error", e instanceof Error ? e.message : "Unknown error");
-  } finally {
-    setIsDownloading(false);
+    if (!sourceUri) {
+    return (
+      <ThemedView style={styles.offlineContainer}>
+        <Text style={styles.offlineText}>No video available offline.</Text>
+        {isConnected && (
+          <TouchableOpacity
+            style={styles.offlineDownload}
+            onPress={downloadVideo}
+          >
+            <Ionicons name="download" size={22} color={Colors.white} />
+            <Text style={styles.downloadText}>Download</Text>
+          </TouchableOpacity>
+        )}
+      </ThemedView>
+    );
   }
-};
- 
 
   return (
     <ThemedView style={styles.card}>
-      <View style={styles.thumbnailWrapper}> 
-
-        <VideoPlayer
-          ref={playerRef}
+      <View style={styles.thumbnailWrapper}>
+        <VideoPlayer 
           endWithThumbnail
           thumbnail={{
             uri: item.thumbnailUrl,
@@ -103,7 +113,7 @@ export default function RenderVideoItem({
             uri: sourceUri,
           }}
           onError={(e) => console.log(e)}
-          showDuration={true}  
+          showDuration={true}
           paused={paused}
         />
 
@@ -213,5 +223,28 @@ const styles = ScaledSheet.create({
   },
   metaText: {
     fontSize: ms(10),
-  },    
+  },
+    offlineDownload: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.primary,
+    padding: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+    offlineText: {
+    fontSize: 14,
+    color: "#991b1b",
+    marginBottom: 8,
+  },
+    offlineContainer: {
+    padding: 20,
+    alignItems: "center",
+    backgroundColor: "#fef2f2",
+    borderRadius: 10,
+    marginBottom: 16,
+  }, downloadText: {
+    color: Colors.white,
+    marginLeft: 6,
+  },
 });

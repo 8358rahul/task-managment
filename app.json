@@ -7,6 +7,11 @@
     "icon": "./assets/images/icon.png",
     "scheme": "taskmanagment",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "purple"
+    },
     "newArchEnabled": true,
     "jsEngine": "hermes",
     "ios": {
@@ -14,11 +19,7 @@
       "bundleIdentifier": "com.rahulshanisare.taskmanagment"
     },
     "android": {
-      "usesCleartextTraffic": true,
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
+      "usesCleartextTraffic": true, 
       "edgeToEdgeEnabled": true,
       "package": "com.rahulshanisare.taskmanagment",
       "permissions": [
@@ -56,9 +57,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "a9d5d308-ae54-4915-abaf-22b2746a6f56"
+        "projectId": "a44deb1b-44b3-4300-b565-c0dda4b162ee"
       }
     },
-    "owner": "rahulshanisare"
+    "owner": "8358rahul"
   }
 }

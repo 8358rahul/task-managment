@@ -11,16 +11,25 @@ export async function fetcher<T = any>(
       url,
       method,
       data: body, // only used for POST/PUT
+      timeout: 10000, // Default timeout in milliseconds (10 seconds)
       headers: {
         'Content-Type': 'application/json',
         ...(options.headers || {}),
       },
-      ...options,
+      ...options, // allows override of timeout and other options
     });
 
     return response.data as T;
   } catch (error: any) {
-    console.error('Axios fetch error:', error?.message || error);
-    throw error;
+  if (axios.isAxiosError(error)) {
+    if (error.code === 'ECONNABORTED') {
+      console.error('Request timed out!');
+    } else {
+      console.error('Axios error:', error.message);
+    }
+  } else {
+    console.error('Unexpected error:', error);
   }
+  throw error;
+}
 }
