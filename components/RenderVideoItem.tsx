@@ -1,14 +1,11 @@
 import { Colors } from "@/constants/Colors";
 import { useVideoStore } from "@/store/videoStore";
 import { Ionicons } from "@expo/vector-icons";
-import { useEvent } from "expo";
 import * as FileSystem from "expo-file-system";
-import { useVideoPlayer, VideoView } from "expo-video";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -18,17 +15,24 @@ import { ms, ScaledSheet } from "react-native-size-matters";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
 
+import VideoPlayer from "react-native-video-player";
 
 export default function RenderVideoItem({
   item,
   isConnected,
+  playerRef,
 }: {
   item: any;
   isConnected: boolean;
+  playerRef:any
 }) {
   const { downloaded, setDownloadedUri } = useVideoStore();
   const [progressMap, setProgressMap] = useState<Record<string, number>>({});
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false); 
+
+ 
+
+
 
   const isDownloaded = !!downloaded[item.id];
   const progress = progressMap[item.id] || 0;
@@ -37,64 +41,51 @@ export default function RenderVideoItem({
     ? downloaded[item.id]
     : isConnected
     ? item.videoUrl
-    : null;
-
-  const player = useVideoPlayer({ uri: sourceUri }, (player) => {
-    player.loop = true;
-    // player.play();
-  });
-
-  const { isPlaying } = useEvent(player, "playingChange", {
-    isPlaying: player.playing,
-  });
-
-  useEffect(()=>{
- return () => {
-        player.pause();
-      };
-  },[])
-
+    : null;  
  
 
-  
-  const downloadVideo = async () => {
-    if (!isConnected) {
-      Alert.alert("Offline", "Cannot download while offline.");
-      return;
-    }
+ const downloadVideo = async () => {
+  if (!isConnected) {
+    Alert.alert("Offline", "Cannot download while offline.");
+    return;
+  }
 
-    const uri = FileSystem.documentDirectory + `video_${item.id}.mp4`;
-    // Ensure directory exists (usually it does, but safe to check)
-    await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory!, {
-      intermediates: true,
-    });
-    
-    const callback = (dl: FileSystem.DownloadProgressData) => {
-      const prog = dl.totalBytesExpectedToWrite
-        ? dl.totalBytesWritten / dl.totalBytesExpectedToWrite
-        : 0;
-      setProgressMap((prev) => ({ ...prev, [item.id]: prog }));
-    };
+  // Add null check for documentDirectory
+  const documentDir = FileSystem.documentDirectory;
+  if (!documentDir) {
+    Alert.alert("Error", "Cannot access storage directory");
+    return;
+  }
 
-    const downloadResumable = FileSystem.createDownloadResumable(
-      item.videoUrl,
-      uri,
-      {},
-      callback
-    );
+  const uri = documentDir + `video_${item.id}.mp4`; // Now safe to use
 
-    try {
-      setIsDownloading(true);
-      const { uri: localUri }: any = await downloadResumable.downloadAsync();
-      setDownloadedUri(item.id, localUri);
-    } catch (e) {
-      console.error("Download error:", e);
-      Alert.alert("Download Error", "Unable to download this video.");
-    } finally {
-      setIsDownloading(false);
-    }
+  const callback = (dl: FileSystem.DownloadProgressData) => {
+    const prog = dl.totalBytesExpectedToWrite
+      ? dl.totalBytesWritten / dl.totalBytesExpectedToWrite
+      : 0;
+    setProgressMap((prev) => ({ ...prev, [item.id]: prog }));
   };
 
+  const downloadResumable = FileSystem.createDownloadResumable(
+    item.videoUrl,
+    uri,
+    {},
+    callback
+  );
+
+  try {
+    setIsDownloading(true);
+    const result = await downloadResumable.downloadAsync();
+    
+    if (!result) throw new Error('Download failed: no result');
+    setDownloadedUri(item.id, result.uri);
+  } catch (e) {
+    console.error("Download error:", e);
+    Alert.alert("Download Error", e instanceof Error ? e.message : "Unknown error");
+  } finally {
+    setIsDownloading(false);
+  }
+};
   if (!sourceUri) {
     return (
       <ThemedView style={styles.offlineContainer}>
@@ -114,20 +105,19 @@ export default function RenderVideoItem({
 
   return (
     <ThemedView style={styles.card}>
-      <View style={styles.thumbnailWrapper}>
-        {!isPlaying && (
-          <Image
-            source={{ uri: item.thumbnailUrl }}
-            style={styles.video}
-            resizeMode="cover"
-          />
-        )}
+      <View style={styles.thumbnailWrapper}> 
 
-        <VideoView
-          style={styles.video}
-          player={player}
-          allowsFullscreen
-          allowsPictureInPicture
+        <VideoPlayer
+          ref={playerRef}
+          endWithThumbnail
+          thumbnail={{
+            uri: item.thumbnailUrl,
+          }}
+          source={{
+            uri: sourceUri,
+          }}
+          onError={(e) => console.log(e)}
+          showDuration={true}  
         />
 
         <View style={styles.durationBadge}>
@@ -142,7 +132,7 @@ export default function RenderVideoItem({
 
         {isDownloading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator color={Colors.primary} size={'large'}/>
+            <ActivityIndicator color={Colors.primary} size={"large"} />
             <ThemedText type="defaultSemiBold" style={styles.progressText}>
               {(progress * 100).toFixed(0)}%
             </ThemedText>

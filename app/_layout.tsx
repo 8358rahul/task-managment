@@ -31,7 +31,9 @@ export default function RootLayout() {
     <ThemeProvider value={resolvedTheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{headerTitleAlign: 'center'}}>
         <Stack.Screen name="(tabs)" options={{headerShown: false}} />
-        <Stack.Screen name="+not-found" />   
+        <Stack.Screen name="+not-found" />  
+
+          
       </Stack>
       <StatusBar style={resolvedTheme === 'dark' ? 'light' : 'dark'} />
     </ThemeProvider>

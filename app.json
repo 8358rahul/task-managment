@@ -14,20 +14,25 @@
       "bundleIdentifier": "com.rahulshanisare.taskmanagment"
     },
     "android": {
+            "usesCleartextTraffic": true
+,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.rahulshanisare.taskmanagment",
-      "permissions": [
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE", 
-        "android.permission.MEDIA_LIBRARY"
-        
-      ]
+     "permissions": [
+  "FOREGROUND_SERVICE",
+  "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+  "READ_EXTERNAL_STORAGE",
+  "WRITE_EXTERNAL_STORAGE",
+  "MEDIA_LIBRARY",
+  "INTERNET",
+  "ACCESS_NETWORK_STATE",
+  "READ_MEDIA_VIDEO"
+]
+
     },
     "web": {
       "bundler": "metro",
@@ -45,14 +50,7 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-localization",
-       [
-        "expo-video",
-        {
-          "supportsBackgroundPlayback": true,
-          "supportsPictureInPicture": true
-        }
-      ]
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true
