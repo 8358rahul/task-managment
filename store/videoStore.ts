@@ -13,23 +13,24 @@ interface VideoState {
   videoList: VideoItem[];
   downloaded: Record<number, string>; // id -> local uri
   setVideoList: (videos: VideoItem[]) => void;
-  setDownloadedUri: (id: number, uri: string) => void;
+  setDownloadedUri: (id: number, uri: string) => void; 
+
 }
 
 export const useVideoStore = create<VideoState>()(
   persist(
     (set) => ({
       videoList: [],
-      downloaded: {},
+      downloaded: {}, 
       setVideoList: (videos: VideoItem[]) => set({ videoList: videos }),
       setDownloadedUri: (id: number, uri: string) =>
-        set((state) => ({
+        set((state:any) => ({
           downloaded: { ...state.downloaded, [id]: uri },
         })),
     }),
     {
       name: 'videos-storage',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => AsyncStorage), 
     }
   )
 );

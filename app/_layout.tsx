@@ -1,3 +1,4 @@
+import NetInfo from "@react-native-community/netinfo";
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -5,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
+import { useNetInfo } from "@/store/netInfo";
 import { useThemeStore } from '@/store/themeStore';
 import { Appearance } from 'react-native';
 
@@ -14,14 +16,25 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
+  const {setIsConnected} = useNetInfo()
+
   // Watch system theme changes to keep Zustand in sync
   useEffect(() => {
     const subscription = Appearance.addChangeListener(() => {
       resolveTheme();
     });
     resolveTheme(); // initial resolve on app load
-    return () => subscription.remove();
+
+     const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected ?? false);
+    });
+    return () =>{
+       subscription.remove()
+      unsubscribe();
+
+      };
   }, []);
+ 
 
   
 

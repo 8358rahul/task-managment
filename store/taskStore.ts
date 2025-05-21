@@ -8,7 +8,7 @@ export interface Task {
   description?: string;
   dueDate: string;       // ISO string format
   priority: number;
-  completed: boolean;
+  completed: boolean; 
 }
 
 interface TaskState {
@@ -16,13 +16,13 @@ interface TaskState {
   addTask: (task: Task) => void;
   updateTask: (updated: Task) => void;
   deleteTask: (id: number) => void;
-  toggleTask: (id: number) => void;
+  toggleTask: (id: number) => void; 
 }
 
 export const useTaskStore = create<TaskState>()(
   persist(
     (set, get) => ({
-      tasks: [],
+      tasks: [], 
       addTask: (task: Task) =>
         set((state:any) => ({ tasks: [...state.tasks, task] })),
       updateTask: (updated: Task) =>
@@ -42,7 +42,7 @@ export const useTaskStore = create<TaskState>()(
     }),
     {
       name: 'tasks-storage',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => AsyncStorage)
     }
   )
 );

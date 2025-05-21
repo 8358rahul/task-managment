@@ -86,22 +86,7 @@ export default function RenderVideoItem({
     setIsDownloading(false);
   }
 };
-  if (!sourceUri) {
-    return (
-      <ThemedView style={styles.offlineContainer}>
-        <Text style={styles.offlineText}>No video available offline.</Text>
-        {isConnected && (
-          <TouchableOpacity
-            style={styles.offlineDownload}
-            onPress={downloadVideo}
-          >
-            <Ionicons name="download" size={22} color={Colors.white} />
-            <Text style={styles.downloadText}>Download</Text>
-          </TouchableOpacity>
-        )}
-      </ThemedView>
-    );
-  }
+ 
 
   return (
     <ThemedView style={styles.card}>
@@ -186,7 +171,7 @@ const styles = ScaledSheet.create({
   },
   durationText: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: "12@ms",
   },
   downloadIcon: {
     position: "absolute",
@@ -204,7 +189,7 @@ const styles = ScaledSheet.create({
   },
   progressText: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: "12@ms",
     marginTop: 4,
   },
   infoRow: {
@@ -226,43 +211,5 @@ const styles = ScaledSheet.create({
   },
   metaText: {
     fontSize: ms(10),
-  },
-  offlineContainer: {
-    padding: 20,
-    alignItems: "center",
-    backgroundColor: "#fef2f2",
-    borderRadius: 10,
-    marginBottom: 16,
-  },
-  offlineText: {
-    fontSize: 14,
-    color: "#991b1b",
-    marginBottom: 8,
-  },
-  offlineDownload: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: Colors.primary,
-    padding: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  downloadText: {
-    color: Colors.white,
-    marginLeft: 6,
-  },
-  controlButtons: {
-    position: "absolute",
-    bottom: 12,
-    left: 12,
-    flexDirection: "row",
-    gap: 16,
-    zIndex: 50,
-  },
-
-  skipButton: {
-    backgroundColor: "#00000088",
-    padding: 10,
-    borderRadius: 20,
-  },
+  },    
 });

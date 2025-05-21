@@ -5,9 +5,9 @@ import TaskCard from "@/components/TaskItem";
 import { ThemedView } from "@/components/ThemedView";
 import AndPoints from "@/constants/AndPoints";
 import { Colors } from "@/constants/Colors";
-import { useTheme } from "@/hooks/useTheme";
 import { useTaskStore } from "@/store/taskStore";
 import { fetcher } from "@/utils/fetcher";
+import { useNetInfo } from "@react-native-community/netinfo";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -18,18 +18,19 @@ import {
 } from "react-native";
 import { ms, vs } from "react-native-size-matters";
 
-export default function TaskScreen() {
-  const { theme, setTheme,resolvedTheme } = useTheme();
+export default function TaskScreen() { 
   const { tasks, addTask, toggleTask } = useTaskStore();
+  const {isConnected} = useNetInfo()
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "completed" | "incomplete">(
     "all"
   );
   const [sortBy, setSortBy] = useState<"dueDate" | "priority">("dueDate");
- 
+  
+  
 
-  useEffect(() => {
-    if (tasks.length === 0) {
+  useEffect(() => { 
+    if (tasks?.length === 0 && isConnected) {
       fetchTasks();
     } else {
       setLoading(false);
