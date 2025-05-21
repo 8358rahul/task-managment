@@ -103,7 +103,7 @@ export default function TaskScreen() {
         keyExtractor={(item, index) => index?.toString()}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={<NoDataFound onPress={() => fetchTasks()} />}
-        contentContainerStyle={{ paddingBottom: vs(80) }}
+        contentContainerStyle={{ paddingBottom: vs(50) }}
         renderItem={({ item }) => {
           return (
             <TaskCard

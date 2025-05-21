@@ -19,6 +19,10 @@
       "bundleIdentifier": "com.rahulshanisare.taskmanagment"
     },
     "android": {
+        "adaptiveIcon": {
+        "foregroundImage": "./assets/images/splash.png",
+        "backgroundColor": "#800080"
+      },
       "usesCleartextTraffic": true, 
       "edgeToEdgeEnabled": true,
       "package": "com.rahulshanisare.taskmanagment",

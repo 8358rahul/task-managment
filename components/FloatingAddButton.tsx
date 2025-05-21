@@ -14,7 +14,7 @@ export default function FloatingAddButton({ onPress }: { onPress: () => void }) 
 const styles = ScaledSheet.create({
   fab: {
     position: 'absolute',
-    bottom: "40@vs",
+    bottom: "20@vs",
     right: "24@s",
     backgroundColor: Colors.primary,
     width: "56@ms",
