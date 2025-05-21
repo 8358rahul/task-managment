@@ -18,6 +18,7 @@ import { ms, ScaledSheet } from "react-native-size-matters";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
 
+
 export default function RenderVideoItem({
   item,
   isConnected,
@@ -63,7 +64,11 @@ export default function RenderVideoItem({
     }
 
     const uri = FileSystem.documentDirectory + `video_${item.id}.mp4`;
-
+    // Ensure directory exists (usually it does, but safe to check)
+    await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory!, {
+      intermediates: true,
+    });
+    
     const callback = (dl: FileSystem.DownloadProgressData) => {
       const prog = dl.totalBytesExpectedToWrite
         ? dl.totalBytesWritten / dl.totalBytesExpectedToWrite
