@@ -47,8 +47,7 @@ interface TextInputProps extends RequiredProps {
   labelStyle?: any;
   maxSelect?: number;
   editable?: boolean;
-  secureTextEntry?: boolean;
-  numberOfChecked?: number;
+  secureTextEntry?: boolean; 
   onPress?: () => void;
   keyboardType?:
     | "default"
@@ -76,8 +75,8 @@ interface TextInputProps extends RequiredProps {
 }
 
 const CustomValidation = (props: TextInputProps) => {
-  const { numberOfChecked = 1, inputMode = "outlined" } = props;
-  const { theme } = useTheme();
+  const { inputMode = "outlined" } = props;
+  const { resolvedTheme:theme } = useTheme();
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
   const dropIcon = (

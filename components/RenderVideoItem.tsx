@@ -182,10 +182,10 @@ const styles = ScaledSheet.create({
   },
   durationBadge: {
     position: "absolute",
-    bottom: 8,
-    right: 8,
+    bottom: "8@ms",
+    right: "8@ms",
     backgroundColor: "#000000cc",
-    borderRadius: 4,
+    borderRadius: "4@ms",
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
