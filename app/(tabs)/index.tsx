@@ -27,17 +27,18 @@ export default function TaskScreen() {
   );
   const [sortBy, setSortBy] = useState<"dueDate" | "priority">("dueDate");
   
-  
+  console.log(tasks.length)
 
-  useEffect(() => { 
-    if (tasks?.length === 0 && isConnected) {
-      fetchTasks();
-    } else {
+  useEffect(() => {  
+    if(tasks?.length>0){
       setLoading(false);
-    } 
+      return;
+    }
+      fetchTasks(); 
   }, []);
 
-  async function fetchTasks() {
+  async function fetchTasks() { 
+    console.log("fetching tasks");
     try {
       const data = await fetcher(AndPoints.TASKURL);
       const initialTasks = data?.map((t: any) => ({

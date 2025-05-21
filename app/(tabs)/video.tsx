@@ -5,38 +5,41 @@ import AndPoints from "@/constants/AndPoints";
 import { useNetInfo } from "@/store/netInfo";
 import { useVideoStore } from "@/store/videoStore";
 import { fetcher } from "@/utils/fetcher";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Text
-} from "react-native";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Alert, FlatList, Text } from "react-native";
 import { vs } from "react-native-size-matters";
 import { VideoPlayerRef } from "react-native-video-player";
 
 export default function OfflineVideoScreen() {
   const { videoList, setVideoList } = useVideoStore();
-  const [isLoading, setIsLoading] = useState(true); 
-  const playerRef = useRef<VideoPlayerRef>(null); 
-  const {isConnected} = useNetInfo()
+  const [isLoading, setIsLoading] = useState(true);
+  const playerRef = useRef<VideoPlayerRef>(null);
+  const { isConnected } = useNetInfo();
+
  
+  useEffect(()=>{ 
+    if(videoList?.length>0) {
+      setIsLoading(false)
+      return;
+    };
+    fetchVideos();
+   
+  },[])
+const [screenFocused, setScreenFocused] = useState(true);
 
-  // Fetch video list JSON
-  useEffect(() => { 
-    if (videoList?.length === 0 && isConnected) {
-      fetchVideos();
-    } else {
-      setIsLoading(false);
-    }
+
+useFocusEffect(
+  useCallback(() => {
+    setScreenFocused(true);
     return () => {
-             playerRef?.current?.pause();
-
-    
-    }
-  }, []);
+      setScreenFocused(false);
+    };
+  }, [])
+);
 
   async function fetchVideos() {
+    console.log("fetching videos");
     try {
       const data = await fetcher(AndPoints.VIDEOURL);
       setVideoList(data);
@@ -46,11 +49,6 @@ export default function OfflineVideoScreen() {
       setIsLoading(false);
     }
   }
-
- 
- 
-
- 
 
   if (isLoading)
     return (
@@ -74,6 +72,7 @@ export default function OfflineVideoScreen() {
             item={item}
             isConnected={isConnected}
             playerRef={playerRef}
+      paused={!screenFocused}
           />
         )}
         contentContainerStyle={{ paddingBottom: vs(80) }}

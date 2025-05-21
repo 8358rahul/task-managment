@@ -21,17 +21,18 @@ export default function RenderVideoItem({
   item,
   isConnected,
   playerRef,
+  paused
 }: {
   item: any;
   isConnected: boolean;
   playerRef:any
+  paused:boolean
 }) {
   const { downloaded, setDownloadedUri } = useVideoStore();
   const [progressMap, setProgressMap] = useState<Record<string, number>>({});
   const [isDownloading, setIsDownloading] = useState(false); 
 
  
-
 
 
   const isDownloaded = !!downloaded[item.id];
@@ -103,6 +104,7 @@ export default function RenderVideoItem({
           }}
           onError={(e) => console.log(e)}
           showDuration={true}  
+          paused={paused}
         />
 
         <View style={styles.durationBadge}>
