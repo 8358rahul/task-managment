@@ -112,7 +112,7 @@ export default function TaskScreen() {
               onPress={() =>
                 router.push({
                   pathname: "/task-details",
-                  params: { taskId: item.id },
+                  params: { taskId: item?.id },
                 })
               }
             />

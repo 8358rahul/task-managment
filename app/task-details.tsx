@@ -15,8 +15,7 @@ export default function TaskDetailsScreen() {
   const { taskId } = useLocalSearchParams<any>();
   const { tasks, deleteTask } = useTaskStore();
   const task: any = tasks?.find((t: any) => t?.id === Number(taskId));
-  const { resolvedTheme } = useTheme();
-  if (!task) return <Text style={styles.errorText}>Task not found</Text>;
+  const { resolvedTheme } = useTheme(); 
 
   const navigation = useNavigation()
   useEffect(()=>{
@@ -36,7 +35,7 @@ export default function TaskDetailsScreen() {
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            deleteTask(task.id);
+            deleteTask(task?.id);
             router.back();
           },
         },
@@ -45,11 +44,14 @@ export default function TaskDetailsScreen() {
   };
 
   const priorityColor =
-    task.priority === 3
+    task?.priority === 3
       ? "#dc2626"
-      : task.priority === 2
+      : task?.priority === 2
       ? "#facc15"
       : "#10b981";
+
+   if (!task) return <Text style={styles.errorText}>Task not found</Text>;
+
 
   return (
     <ThemedView style={styles.container}>
@@ -57,19 +59,19 @@ export default function TaskDetailsScreen() {
         style={[styles.card, { backgroundColor: Colors[resolvedTheme].cart }]}
       >
         <ThemedText type="subtitle" style={styles.title}>
-          {task.title}
+          {task?.title}
         </ThemedText>
 
         <View style={{ height: vs(6) }} />
         <View style={styles.row}>
           <Ionicons name="calendar" size={18} color="#888" />
           <ThemedText type="default" style={styles.infoText}>
-            Due: {formatTimeForAPI(task.dueDate)}
+            Due: {formatTimeForAPI(task?.dueDate)}
           </ThemedText>
         </View>
 
         <View style={styles.row}>
-          <Ionicons name="alert-circle" size={18} color={priorityColor} />
+          <Ionicons name="alert-circle" size={ms(18)} color={priorityColor} />
           <ThemedText
             type="default"
             style={[
@@ -78,9 +80,9 @@ export default function TaskDetailsScreen() {
             ]}
           >
             Priority:{" "}
-            {task.priority === 3
+            {task?.priority === 3
               ? "high"
-              : task.priority === 2
+              : task?.priority === 2
               ? "medium"
               : "low"}
           </ThemedText>
@@ -88,17 +90,17 @@ export default function TaskDetailsScreen() {
 
         <View style={styles.row}>
           <Ionicons
-            name={task.completed ? "checkmark-done-circle" : "time"}
-            size={18}
-            color={task.completed ? "#10b981" : "#f59e0b"}
+            name={task?.completed ? "checkmark-done-circle" : "time"}
+            size={ms(18)}
+            color={task?.completed ? "#10b981" : "#f59e0b"}
           />
           <Text
             style={[
               styles.infoText,
-              { color: task.completed ? "#10b981" : "#f59e0b" },
+              { color: task?.completed ? "#10b981" : "#f59e0b" },
             ]}
           >
-            {task.completed ? "Completed" : "Incomplete"}
+            {task?.completed ? "Completed" : "Incomplete"}
           </Text>
         </View>
 
@@ -109,8 +111,8 @@ export default function TaskDetailsScreen() {
           Description
         </ThemedText>
         <ThemedText type="default" style={styles.description}>
-          {task.description?.trim()
-            ? task.description
+          {task?.description?.trim()
+            ? task?.description
             : "No description provided."}
         </ThemedText>
       </View>
@@ -128,7 +130,7 @@ export default function TaskDetailsScreen() {
           onPress={() => {
             router.push({
               pathname: "/add-edit-task",
-              params: { taskId: task.id },
+              params: { taskId: task?.id },
             });
           }}
           style={{ width: "45%", backgroundColor: Colors.primary }}
