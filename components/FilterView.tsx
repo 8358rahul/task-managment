@@ -39,7 +39,7 @@ const FilterView = ({ setFilter, filter, sortBy, setSortBy }: any) => {
             styles.btnStyle,
             {
               backgroundColor:
-                filter === filterItem.value ? "#2563eb" : Colors[theme].cart,
+                filter === filterItem.value ? Colors.primary : Colors[theme].cart,
             },
           ]}
         >
@@ -62,7 +62,7 @@ const FilterView = ({ setFilter, filter, sortBy, setSortBy }: any) => {
             styles.btnStyle,
             {
               backgroundColor:
-                sortBy === sortItem.value ? "#10b981" : Colors[theme].cart,
+                sortBy === sortItem.value ?Colors.blue : Colors[theme].cart,
             },
           ]}
         >

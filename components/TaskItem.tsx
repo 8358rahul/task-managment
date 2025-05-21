@@ -18,14 +18,14 @@ export default function TaskCard({ task, onPress, onToggle }: any) {
       : "#10b981";
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.9}
+    <TouchableOpacity 
       onPress={onPress}
       style={[
         styles.card,
         {
           backgroundColor: Colors[theme].cart,
-          borderColor: task.completed ? "#10b981" : Colors[theme].border,
+          borderColor: task.completed ? "#10b981" : Colors[theme].border, 
+          shadowColor: task.completed ? "#10b981" : Colors[theme].border,
         },
       ]}
     >
@@ -35,7 +35,8 @@ export default function TaskCard({ task, onPress, onToggle }: any) {
           style={[
             styles.title,
             {
-              textTransform: "capitalize",
+              textTransform: "capitalize", 
+              lineHeight: ms(18),
             },
           ]}
         >
@@ -51,12 +52,12 @@ export default function TaskCard({ task, onPress, onToggle }: any) {
         </TouchableOpacity>
       </View>
 
-      <ThemedText type="default" style={[styles.description]} numberOfLines={2}>
+      <ThemedText type="default" style={styles.description} numberOfLines={2}>
         {task.description || "No description provided."}
       </ThemedText>
 
       <View style={styles.footer}>
-        <ThemedText type="default" style={{ fontSize: ms(12),lineHeight:ms(18) }}>
+        <ThemedText type="default" style={{ fontSize: ms(12) }}>
           Due: {formatTimeForAPI(task.dueDate)}
         </ThemedText>
 
@@ -90,16 +91,16 @@ export default function TaskCard({ task, onPress, onToggle }: any) {
 }
 
 const styles = ScaledSheet.create({
-  card: {
-    borderWidth: 0.5,
-    borderRadius: 14,
+  card: { 
+    borderRadius: "14@ms",
     padding: "16@ms",
-    marginBottom: "12@vs",
-    shadowColor: "#000",
+    marginBottom: "12@vs", 
     shadowOpacity: 0.06,
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 1 },
-    elevation: 5,
+    elevation: 5, 
+    borderWidth: 0.5,
+
   },
   header: {
     flexDirection: "row",
@@ -111,8 +112,7 @@ const styles = ScaledSheet.create({
     flexShrink: 1,
   },
   description: {
-    fontSize: "12@ms",
-    marginBottom: "12@vs",
+    fontSize: "12@ms", 
   },
   footer: {
     flexDirection: "row",

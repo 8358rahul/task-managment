@@ -8,7 +8,7 @@ import { fetcher } from "@/utils/fetcher";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import NetInfo from "@react-native-community/netinfo";
 import { useNavigation } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -22,24 +22,11 @@ import { ms, vs } from "react-native-size-matters";
 export default function OfflineVideoScreen() {
   const { videoList, setVideoList } = useVideoStore();
   const [isLoading, setIsLoading] = useState(true);
-  const [isConnected, setIsConnected] = useState(true);
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const [isConnected, setIsConnected] = useState(true); 
   const { theme, setTheme, resolvedTheme } = useTheme();
   const navigation = useNavigation();
 
-  const onViewRef = useRef(
-    ({ viewableItems }: { viewableItems: Array<{ item: any }> }) => {
-      if (viewableItems.length > 0) {
-        // only activate the first visible item
-        setActiveVideoId(viewableItems[0].item.id);
-      }
-    }
-  );
-
-  const viewConfigRef = useRef({
-    itemVisiblePercentThreshold: 60,
-  });
-
+ 
   // Fetch video list JSON
   useEffect(() => {
     fetchVideos();
@@ -106,14 +93,11 @@ export default function OfflineVideoScreen() {
         renderItem={({ item }) => (
           <RenderVideoItem
             item={item}
-            isConnected={isConnected}
-            activeVideoId={activeVideoId}
-            setActiveVideoId={setActiveVideoId}
-          />
+            isConnected={isConnected} 
+          /> 
+
         )}
-        contentContainerStyle={{ paddingBottom: vs(80) }}
-        onViewableItemsChanged={onViewRef.current}
-        viewabilityConfig={viewConfigRef.current}
+        contentContainerStyle={{ paddingBottom: vs(80) }} 
       />
     </View>
   );

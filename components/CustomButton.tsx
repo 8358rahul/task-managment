@@ -24,7 +24,7 @@ interface CustomButtonProps {
 }
 
 const CustomButton = (props: CustomButtonProps) => {
-  const { theme } = useTheme();
+  const { resolvedTheme:theme } = useTheme();
 
   return (
     <Pressable
@@ -33,7 +33,7 @@ const CustomButton = (props: CustomButtonProps) => {
       style={[
         styles.gradient,
         {
-          backgroundColor: props.disabled ? Colors.gray : Colors[theme].button,
+          backgroundColor: props.disabled ? Colors.gray : Colors.primary,
           borderColor: Colors[theme].border,
         },
         props.style,
@@ -69,7 +69,7 @@ const styles = ScaledSheet.create({
     width: "100%",
   },
   gradient: {
-    paddingVertical: "8@vs",
+    paddingVertical: "7@vs",
     paddingHorizontal: "30@s",
     borderRadius: "16@ms",
     alignItems: "center",

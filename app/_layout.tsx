@@ -23,11 +23,13 @@ export default function RootLayout() {
     return () => subscription.remove();
   }, []);
 
+  
+
   if (!loaded) return null;
 
   return (
     <ThemeProvider value={resolvedTheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack   >
+      <Stack screenOptions={{headerTitleAlign: 'center'}}>
         <Stack.Screen name="(tabs)" options={{headerShown: false}} />
         <Stack.Screen name="+not-found" />  
 

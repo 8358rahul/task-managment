@@ -151,7 +151,7 @@ export default function AddEditTaskScreen() {
         minimumDate={new Date()}
         onDateTimeSelection={(event: any, selectedDate: any) => {
           if (event.type != "dismissed")
-            setValue("dueDate", selectedDate.toISOString());
+            setValue("dueDate", selectedDate.toISOString(),{ shouldValidate: true });
           setDateTimePickerProps(getDateTimePickerProps(false));
         }}
       />

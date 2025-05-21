@@ -8,15 +8,13 @@ import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/hooks/useTheme";
 import { useTaskStore } from "@/store/taskStore";
 import { fetcher } from "@/utils/fetcher";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { router, useNavigation } from "expo-router";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   FlatList,
-  TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { ms, vs } from "react-native-size-matters";
 
@@ -28,33 +26,14 @@ export default function TaskScreen() {
     "all"
   );
   const [sortBy, setSortBy] = useState<"dueDate" | "priority">("dueDate");
-
-  const navigation = useNavigation();
+ 
 
   useEffect(() => {
     if (tasks.length === 0) {
       fetchTasks();
     } else {
       setLoading(false);
-    }
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={() => {
-            const nextTheme =
-    theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
-  setTheme(nextTheme);
-          }}
-          style={{ right: ms(10) }}
-        >
-          <MaterialCommunityIcons
-            name="theme-light-dark"
-            size={ms(24)}
-            color={Colors[resolvedTheme].icon}
-          />
-        </TouchableOpacity>
-      ),
-    });
+    } 
   }, []);
 
   async function fetchTasks() {
@@ -89,9 +68,9 @@ export default function TaskScreen() {
   // Sorting
   const sorted = [...filtered].sort((a, b) => {
     if (sortBy === "dueDate") {
-      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      return new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime();
     } else {
-      return a.priority - b.priority;
+      return b.priority - a.priority;
     }
   });
 
